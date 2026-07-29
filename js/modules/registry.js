@@ -38,7 +38,7 @@ const ModuleRegistry = {
       name: '自媒体专区',
       navId: 'work',
       icon: '🎬',
-      keywords: ['自媒体', '剪辑', '视频', 'B站', '抖音', '关键词'],
+      keywords: ['自媒体', '剪辑', '视频', '抖音', '关键词'],
       render: (c) => MediaModule.render(c),
       init: () => MediaModule.init()
     },

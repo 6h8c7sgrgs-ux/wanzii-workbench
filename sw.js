@@ -1,5 +1,5 @@
 /* ===== 玩子工作台 Service Worker ===== */
-const CACHE_NAME = 'wanzii-workbench-v2';
+const CACHE_NAME = 'wanzii-workbench-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
   './js/modules/personal.js',
   './js/modules/checkin.js',
   './js/modules/skills.js',
+  './js/modules/reading.js',
   './data/presets.js',
   './icons/icon-192.png',
   './icons/icon-512.png',

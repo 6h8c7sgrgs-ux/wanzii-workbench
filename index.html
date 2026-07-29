@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#7EB8DA">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="工作台">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="description" content="玩子的专属工作台：寿山石、茶叶、自媒体、记账、打卡、冥想一站式管理">
+
+  <title>玩子的工作台</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 顶部栏 -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="logo">🌊 玩子的工作台</span>
+      </div>
+      <div class="topbar-center">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" placeholder="输入口令快速跳转，如 #记账 #打卡 #寿山石…">
+          <span class="search-hint">回车跳转</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="current-date" class="date-display"></span>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <!-- 左侧导航 -->
+      <nav class="sidebar" id="sidebar">
+        <!-- 导航项由 JS 动态生成 -->
+      </nav>
+
+      <!-- 主内容区 -->
+      <main class="content">
+        <!-- 子模块 Tab -->
+        <div class="subnav" id="subnav"></div>
+        <!-- 模块内容容器 -->
+        <div class="module-container" id="module-container"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toast-container"></div>
+
+  <!-- 模态框容器 -->
+  <div id="modal-container"></div>
+
+  <!-- 脚本加载（注意顺序：依赖在前） -->
+  <script src="data/presets.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/modules/registry.js"></script>
+  <script src="js/modules/work.js"></script>
+  <script src="js/modules/personal.js"></script>
+  <script src="js/modules/checkin.js"></script>
+  <script src="js/modules/skills.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- 注册 Service Worker (PWA 离线支持) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('✓ PWA 已就绪，可添加到主屏幕'))
+          .catch(err => console.warn('SW 注册失败:', err));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -114,7 +114,7 @@ const ShoushanModule = {
           </div>
           <div class="flex gap-2 mt-2">
             <button class="btn btn-secondary btn-sm" data-toggle-knowledge="${i}">展开知识</button>
-            <button class="btn btn-secondary btn-sm" data-search-btn="${UI.escape(t.searchKw)}">🎬 B站搜索</button>
+            <button class="btn btn-secondary btn-sm" data-search-btn="${UI.escape(t.searchKw)}">🎵 抖音搜索</button>
             <button class="btn btn-secondary btn-sm" data-search-yt="${UI.escape(t.searchKw)}">▶️ YouTube</button>
           </div>
         </div>
@@ -127,8 +127,8 @@ const ShoushanModule = {
     target.querySelectorAll('[data-search], [data-search-btn]').forEach(el => {
       el.addEventListener('click', () => {
         const kw = el.dataset.search || el.dataset.searchBtn;
-        window.open('https://search.bilibili.com/all?keyword=' + encodeURIComponent(kw), '_blank');
-        UI.toast(`正在B站搜索讲解视频`);
+        window.open('https://www.douyin.com/search/' + encodeURIComponent(kw), '_blank');
+        UI.toast(`正在抖音搜索讲解视频`);
       });
     });
 
@@ -494,9 +494,9 @@ const MediaModule = {
     container.querySelectorAll('[data-search]').forEach(chip => {
       chip.addEventListener('click', () => {
         const term = chip.dataset.search;
-        const url = MediaPresets.keywordTemplates.platforms.bilibili + encodeURIComponent(term);
+        const url = MediaPresets.keywordTemplates.platforms.douyin + encodeURIComponent(term);
         window.open(url, '_blank');
-        UI.toast(`正在B站搜索「${term}」`);
+        UI.toast(`正在抖音搜索「${term}」`);
       });
     });
   },
@@ -565,9 +565,9 @@ const MediaModule = {
     container.querySelectorAll('[data-search]').forEach(chip => {
       chip.addEventListener('click', () => {
         const term = chip.dataset.search;
-        const url = MediaPresets.keywordTemplates.platforms.bilibili + encodeURIComponent(term);
+        const url = MediaPresets.keywordTemplates.platforms.douyin + encodeURIComponent(term);
         window.open(url, '_blank');
-        UI.toast(`正在B站搜索「${term}」`);
+        UI.toast(`正在抖音搜索「${term}」`);
       });
     });
   },
@@ -647,17 +647,12 @@ const MediaModule = {
         </h4>
         <p class="text-sm text-muted mb-4">点击关键词直接跳转到对应平台搜索</p>
 
-        <div class="section-title" style="font-size:13px">B站</div>
-        <div class="keyword-cloud mb-4">
-          ${keywords.map(k => `<span class="keyword-chip" data-platform="bilibili" data-kw="${UI.escape(k)}">${UI.escape(k)}</span>`).join('')}
-        </div>
-
-        <div class="section-title" style="font-size:13px">抖音</div>
+        <div class="section-title" style="font-size:13px">🎵 抖音</div>
         <div class="keyword-cloud mb-4">
           ${keywords.map(k => `<span class="keyword-chip" data-platform="douyin" data-kw="${UI.escape(k)}">${UI.escape(k)}</span>`).join('')}
         </div>
 
-        <div class="section-title" style="font-size:13px">YouTube</div>
+        <div class="section-title" style="font-size:13px">▶️ YouTube</div>
         <div class="keyword-cloud mb-4">
           ${keywords.map(k => `<span class="keyword-chip" data-platform="youtube" data-kw="${UI.escape(k)}">${UI.escape(k)}</span>`).join('')}
         </div>
@@ -674,7 +669,7 @@ const MediaModule = {
         const kw = chip.dataset.kw;
         const url = templates.platforms[platform] + encodeURIComponent(kw);
         window.open(url, '_blank');
-        const platformName = { bilibili: 'B站', douyin: '抖音', youtube: 'YouTube' }[platform];
+        const platformName = { douyin: '抖音', youtube: 'YouTube' }[platform];
         UI.toast(`正在${platformName}搜索「${kw}」`);
       });
     });

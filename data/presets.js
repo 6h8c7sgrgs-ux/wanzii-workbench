@@ -455,3 +455,45 @@ const AccountingCategories = {
   expense: ['餐饮', '交通', '购物', '娱乐', '居住', '医疗', '教育', '社交', '其他'],
   income: ['工资', '兼职', '理财', '红包', '其他']
 };
+
+/* ---------- 英语口语练习片段库 ---------- */
+const EnglishPracticeSnippets = [
+  // 基础
+  { level: '基础', topic: '日常问候', text: "Hi, how are you doing today? I hope everything goes well.", translation: "嗨，你今天怎么样？希望一切顺利。" },
+  { level: '基础', topic: '点餐', text: "I'd like a cup of coffee with milk, please. And a sandwich.", translation: "请给我一杯加奶的咖啡，再来一个三明治。" },
+  { level: '基础', topic: '问路', text: "Excuse me, could you tell me how to get to the nearest subway station?", translation: "打扰一下，请问最近的地铁站怎么走？" },
+  { level: '基础', topic: '购物', text: "How much is this? Can I pay by credit card?", translation: "这个多少钱？可以刷信用卡吗？" },
+  { level: '基础', topic: '天气', text: "The weather is nice today. Let's go for a walk in the park.", translation: "今天天气不错，我们去公园散散步吧。" },
+  { level: '基础', topic: '自我介绍', text: "My name is Lisa. I'm from China and I love reading books.", translation: "我叫丽莎，来自中国，我喜欢读书。" },
+  // 进阶
+  { level: '进阶', topic: '工作交流', text: "I think we should schedule a meeting to discuss the project timeline.", translation: "我觉得我们应该安排一个会议来讨论项目时间线。" },
+  { level: '进阶', topic: '表达观点', text: "In my opinion, the key to success is consistency and patience.", translation: "在我看来，成功的关键是坚持和耐心。" },
+  { level: '进阶', topic: '旅行', text: "I'm planning to visit Japan next spring. Do you have any recommendations?", translation: "我打算明年春天去日本旅行，你有什么推荐吗？" },
+  { level: '进阶', topic: '社交', text: "It's been a while! We should catch up over coffee sometime.", translation: "好久不见了！我们应该找个时间喝杯咖啡叙叙旧。" },
+  { level: '进阶', topic: '健康', text: "I've been trying to exercise more and eat healthier food lately.", translation: "我最近一直在努力多运动、吃更健康的食物。" },
+  { level: '进阶', topic: '情感', text: "I really appreciate your help. You've been so supportive.", translation: "真的很感谢你的帮助，你一直这么支持我。" },
+  // 挑战
+  { level: '挑战', topic: '职场演讲', text: "Today I'd like to share with you our team's achievements over the past quarter.", translation: "今天我想和大家分享我们团队过去一个季度的成果。" },
+  { level: '挑战', topic: '深度讨论', text: "What fascinates me most about this topic is how it connects to our daily lives in unexpected ways.", translation: "这个话题最吸引我的地方在于，它以意想不到的方式与我们的日常生活相连。" },
+  { level: '挑战', topic: '讲故事', text: "When I was young, my grandmother used to tell me stories that shaped who I am today.", translation: "小时候，奶奶常给我讲故事，那些故事塑造了今天的我。" },
+  { level: '挑战', topic: '表达复杂观点', text: "While I understand your perspective, I believe there's another angle we should consider.", translation: "虽然我理解你的观点，但我认为还有另一个角度值得我们考虑。" },
+  { level: '挑战', topic: '面试', text: "My greatest strength is my ability to learn quickly and adapt to new challenges.", translation: "我最大的优势是快速学习和适应新挑战的能力。" },
+  { level: '挑战', topic: '日常复述', text: "So what you're saying is that we need to finish the report before Friday, right?", translation: "所以你的意思是我们需要在周五之前完成报告，对吗？" }
+];
+
+/* ---------- 颜真卿书法笔法讲解关键词库 ---------- */
+const CalligraphyTechniques = [
+  { keyword: '颜真卿 基本笔画 横竖撇捺', name: '基本笔画', desc: '横竖撇捺的运笔方法与起收笔技巧', level: '入门' },
+  { keyword: '颜真卿 永字八法 讲解', name: '永字八法', desc: '一字含八法，楷书笔法的经典入门', level: '入门' },
+  { keyword: '颜真卿 多宝塔碑 临摹教程', name: '多宝塔碑', desc: '颜体楷书入门第一碑，结构严谨', level: '入门' },
+  { keyword: '颜真卿 颜勤礼碑 讲解', name: '颜勤礼碑', desc: '颜体晚年代表作，雄浑大气', level: '进阶' },
+  { keyword: '颜体楷书 结构规律', name: '结构规律', desc: '字形结构、布白与比例关系', level: '进阶' },
+  { keyword: '颜真卿 提按运笔 技法', name: '提按运笔', desc: '笔画的粗细变化与节奏控制', level: '进阶' },
+  { keyword: '颜真卿 藏锋露锋 用笔', name: '藏锋与露锋', desc: '起笔收笔的锋芒处理', level: '进阶' },
+  { keyword: '颜体 中宫宽绰 特点', name: '中宫宽绰', desc: '颜体字形外拓、中宫宽松的特征', level: '提升' },
+  { keyword: '颜真卿 行书 祭侄文稿', name: '祭侄文稿', desc: '天下第二行书，情感与笔法的融合', level: '提升' },
+  { keyword: '颜体 顿笔 折笔 技巧', name: '顿笔与折笔', desc: '转折处的笔法处理与力量控制', level: '提升' },
+  { keyword: '颜真卿 争座位帖 赏析', name: '争座位帖', desc: '颜体行书代表作，笔意纵横', level: '高阶' },
+  { keyword: '颜体 虚实结合 章法', name: '虚实与章法', desc: '整幅作品的疏密、虚实、节奏布局', level: '高阶' }
+];
+

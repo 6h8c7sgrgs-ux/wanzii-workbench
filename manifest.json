@@ -1,0 +1,28 @@
+{
+  "name": "玩子的工作台",
+  "short_name": "工作台",
+  "description": "玩子的专属工作台：寿山石、茶叶、自媒体、记账、打卡、冥想一站式管理",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F9FC",
+  "theme_color": "#7EB8DA",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle"],
+  "screenshots": []
+}

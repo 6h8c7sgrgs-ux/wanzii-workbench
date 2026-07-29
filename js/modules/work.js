@@ -99,18 +99,60 @@ const ShoushanModule = {
 
   renderKnowledge(target) {
     let html = `<div class="section-title">寿山石品类知识</div>`;
-    html += `<p class="text-sm text-muted mb-4">了解每一类石种的特性，做个明白的藏家</p>`;
+    html += `<p class="text-sm text-muted mb-4">了解每一类石种的特性，做个明白的藏家。点击「详细讲解」跳转视频，点击「展开知识」看要点</p>`;
     html += `<div class="grid grid-2">`;
-    ShoushanTypes.forEach(t => {
+    ShoushanTypes.forEach((t, i) => {
       html += `
         <div class="card">
-          <h4 style="font-size:15px;color:var(--primary-darker);margin-bottom:6px">${t.name}</h4>
-          <p class="card-desc">${t.desc}</p>
+          <div class="flex justify-between items-start mb-1">
+            <h4 style="font-size:15px;color:var(--primary-darker)">${t.name}</h4>
+            <span class="tag tag-blue" style="cursor:pointer" data-search="${UI.escape(t.searchKw)}">🔍 详细讲解</span>
+          </div>
+          <p class="card-desc mb-2">${t.desc}</p>
+          <div class="text-sm" style="color:var(--text-secondary);line-height:1.7;display:none" id="ss-knowledge-${i}">
+            ${UI.escape(t.knowledge)}
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button class="btn btn-secondary btn-sm" data-toggle-knowledge="${i}">展开知识</button>
+            <button class="btn btn-secondary btn-sm" data-search-btn="${UI.escape(t.searchKw)}">🎬 B站搜索</button>
+            <button class="btn btn-secondary btn-sm" data-search-yt="${UI.escape(t.searchKw)}">▶️ YouTube</button>
+          </div>
         </div>
       `;
     });
     html += `</div>`;
     target.innerHTML = html;
+
+    // 搜索跳转
+    target.querySelectorAll('[data-search], [data-search-btn]').forEach(el => {
+      el.addEventListener('click', () => {
+        const kw = el.dataset.search || el.dataset.searchBtn;
+        window.open('https://search.bilibili.com/all?keyword=' + encodeURIComponent(kw), '_blank');
+        UI.toast(`正在B站搜索讲解视频`);
+      });
+    });
+
+    target.querySelectorAll('[data-search-yt]').forEach(el => {
+      el.addEventListener('click', () => {
+        const kw = el.dataset.searchYt;
+        window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(kw), '_blank');
+        UI.toast(`正在YouTube搜索讲解视频`);
+      });
+    });
+
+    // 展开知识
+    target.querySelectorAll('[data-toggle-knowledge]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const div = target.querySelector(`#ss-knowledge-${btn.dataset.toggleKnowledge}`);
+        if (div.style.display === 'none' || !div.style.display) {
+          div.style.display = 'block';
+          btn.textContent = '收起知识';
+        } else {
+          div.style.display = 'none';
+          btn.textContent = '展开知识';
+        }
+      });
+    });
   },
 
   showForm(target, item) {

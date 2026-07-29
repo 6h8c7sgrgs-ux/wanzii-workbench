@@ -1,5 +1,5 @@
 /* ===== 玩子工作台 Service Worker ===== */
-const CACHE_NAME = 'wanzii-workbench-v1';
+const CACHE_NAME = 'wanzii-workbench-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -43,26 +43,24 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-/* 拦截请求 - 缓存优先策略 */
+/* 拦截请求 - 网络优先策略（确保更新即时生效，离线时用缓存） */
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+    fetch(event.request).then((networkResponse) => {
+      // 网络成功，缓存最新版本
+      if (networkResponse && networkResponse.status === 200) {
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
       }
-      return fetch(event.request).then((networkResponse) => {
-        // 把新获取的资源也缓存起来
-        if (networkResponse && networkResponse.status === 200) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        // 离线 fallback
+      return networkResponse;
+    }).catch(() => {
+      // 网络失败，使用缓存
+      return caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
         if (event.request.destination === 'document') {
           return caches.match('./index.html');
         }

@@ -6,6 +6,7 @@
 
 const NavGroups = [
   { id: 'work', name: '工作', icon: '💼' },
+  { id: 'reading', name: '读书', icon: '📖' },
   { id: 'personal', name: '个人', icon: '🌿' },
   { id: 'checkin', name: '打卡', icon: '✅' },
   { id: 'skills', name: '技能', icon: '🌟' }
@@ -40,6 +41,26 @@ const ModuleRegistry = {
       keywords: ['自媒体', '剪辑', '视频', 'B站', '抖音', '关键词'],
       render: (c) => MediaModule.render(c),
       init: () => MediaModule.init()
+    },
+    {
+      id: 'douyin-hot',
+      name: '抖音爆款',
+      navId: 'work',
+      icon: '🔥',
+      keywords: ['抖音', '爆款', '拆解', '热门', '流量', '案例'],
+      render: (c) => DouyinHotModule.render(c),
+      init: () => DouyinHotModule.init()
+    },
+
+    // ---------- 读书 ----------
+    {
+      id: 'reading',
+      name: '读书学习',
+      navId: 'reading',
+      icon: '📖',
+      keywords: ['读书', '诗词', '传统文化', '阅读', '书单', '所思所想', '笔记'],
+      render: (c) => ReadingModule.render(c),
+      init: () => ReadingModule.init()
     },
 
     // ---------- 个人 ----------

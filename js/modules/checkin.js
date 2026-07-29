@@ -15,18 +15,21 @@ const CheckinModule = {
         <div class="subnav-item active" data-tab="day" style="background:var(--primary);color:white">日打卡</div>
         <div class="subnav-item" data-tab="week" style="border:1px solid var(--border)">周打卡</div>
         <div class="subnav-item" data-tab="month" style="border:1px solid var(--border)">月打卡</div>
+        <div class="subnav-item" data-tab="practice" style="border:1px solid var(--border)">🎯 专项练习</div>
         <div class="subnav-item" data-tab="photo" style="border:1px solid var(--border)">摄影素材</div>
       </div>
 
       <div id="checkin-day" class="tab-content active"></div>
       <div id="checkin-week" class="tab-content"></div>
       <div id="checkin-month" class="tab-content"></div>
+      <div id="checkin-practice" class="tab-content"></div>
       <div id="checkin-photo" class="tab-content"></div>
     `;
 
     this.renderDay(container);
     this.renderWeek(container);
     this.renderMonth(container);
+    this.renderPractice(container);
     this.renderPhoto(container);
 
     // Tab 切换
@@ -360,6 +363,315 @@ const CheckinModule = {
     html += `</div>`;
 
     target.innerHTML = html;
+  },
+
+  /* ---------- 专项练习 ---------- */
+  renderPractice(container) {
+    const target = container.querySelector('#checkin-practice');
+    target.innerHTML = `
+      <div class="section-title">🗣️ 英语口语练习</div>
+      <div id="english-practice"></div>
+      <div class="section-title" style="margin-top:28px">🖌️ 书法笔法讲解</div>
+      <div id="calligraphy-guide"></div>
+    `;
+    this.renderEnglishPractice(target.querySelector('#english-practice'));
+    this.renderCalligraphyGuide(target.querySelector('#calligraphy-guide'));
+  },
+
+  /* ---- 英语口语练习面板 ---- */
+  renderEnglishPractice(target) {
+    // 按日期取每日推荐，也可随机
+    const today = StorageManager.todayStr();
+    const dayIdx = new Date(today).getDate() % EnglishPracticeSnippets.length;
+    let currentIdx = dayIdx;
+
+    const render = () => {
+      const snippet = EnglishPracticeSnippets[currentIdx];
+      const levelColor = snippet.level === '基础' ? 'tag-green' : snippet.level === '进阶' ? 'tag-blue' : 'tag-orange';
+
+      target.innerHTML = `
+        <div class="card" style="margin-bottom:16px">
+          <div class="flex justify-between items-center mb-2">
+            <div class="flex gap-2 items-center">
+              <span class="tag ${levelColor}">${snippet.level}</span>
+              <span class="tag tag-purple">${snippet.topic}</span>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="next-snippet">换一个 →</button>
+          </div>
+
+          <div style="font-size:18px;line-height:1.8;color:var(--text-primary);margin:16px 0 8px;font-weight:500">
+            ${UI.escape(snippet.text)}
+          </div>
+          <div class="text-sm text-muted" style="margin-bottom:16px">${UI.escape(snippet.translation)}</div>
+
+          <div class="flex gap-2" style="flex-wrap:wrap">
+            <button class="btn btn-primary" id="start-speak">🎙️ 开始朗读</button>
+            <button class="btn btn-secondary" id="stop-speak" style="display:none">⏹️ 停止</button>
+            <button class="btn btn-secondary" id="goto-chengla">📚 去橙啦练习</button>
+          </div>
+
+          <div id="speak-result" style="margin-top:16px"></div>
+          <div id="speak-status" class="text-sm text-muted" style="margin-top:8px"></div>
+        </div>
+      `;
+
+      const startBtn = target.querySelector('#start-speak');
+      const stopBtn = target.querySelector('#stop-speak');
+      const statusEl = target.querySelector('#speak-status');
+      const resultEl = target.querySelector('#speak-result');
+
+      // 检查浏览器支持
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        statusEl.innerHTML = '<span style="color:var(--warning)">⚠️ 当前浏览器不支持语音识别，建议用 Chrome 或 Safari 打开。也可以直接点击「去橙啦练习」使用橙啦的发音评估功能。</span>';
+        startBtn.style.opacity = '0.5';
+        startBtn.style.cursor = 'not-allowed';
+      }
+
+      let recognition = null;
+      let finalTranscript = '';
+
+      startBtn.addEventListener('click', () => {
+        if (!SpeechRecognition) return;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        finalTranscript = '';
+
+        recognition.onstart = () => {
+          startBtn.style.display = 'none';
+          stopBtn.style.display = 'inline-flex';
+          statusEl.innerHTML = '🔴 正在聆听... 请大声朗读上面的英文片段';
+          resultEl.innerHTML = '';
+        };
+
+        recognition.onresult = (event) => {
+          let interim = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            } else {
+              interim += event.results[i][0].transcript;
+            }
+          }
+          if (interim) {
+            statusEl.innerHTML = `<span class="text-muted">识别中: ${UI.escape(interim)}</span>`;
+          }
+        };
+
+        recognition.onerror = (event) => {
+          if (event.error === 'not-allowed') {
+            statusEl.innerHTML = '<span style="color:var(--danger)">需要允许麦克风权限才能朗读评估哦</span>';
+          } else if (event.error === 'no-speech') {
+            statusEl.innerHTML = '<span class="text-muted">没听到声音，再试一次？</span>';
+          } else {
+            statusEl.innerHTML = `<span style="color:var(--warning)">识别出了点小问题: ${event.error}</span>`;
+          }
+          startBtn.style.display = 'inline-flex';
+          stopBtn.style.display = 'none';
+        };
+
+        recognition.onend = () => {
+          startBtn.style.display = 'inline-flex';
+          stopBtn.style.display = 'none';
+          if (finalTranscript.trim()) {
+            this.showSpeakResult(resultEl, finalTranscript.trim(), snippet.text);
+          } else {
+            statusEl.innerHTML = '<span class="text-muted">没有识别到内容，点击「开始朗读」再试一次吧</span>';
+          }
+        };
+
+        try {
+          recognition.start();
+        } catch (e) {
+          statusEl.innerHTML = '<span style="color:var(--warning)">启动失败，请稍后再试</span>';
+        }
+      });
+
+      stopBtn.addEventListener('click', () => {
+        if (recognition) recognition.stop();
+      });
+
+      target.querySelector('#next-snippet').addEventListener('click', () => {
+        currentIdx = (currentIdx + 1) % EnglishPracticeSnippets.length;
+        render();
+      });
+
+      target.querySelector('#goto-chengla').addEventListener('click', () => {
+        window.open('https://sc.orangevip.com/', '_blank');
+        UI.toast('正在打开橙啦英语，登录后可以使用更多练习功能~');
+      });
+    };
+
+    render();
+  },
+
+  /* ---- 发音评估结果展示 ---- */
+  showSpeakResult(container, spoken, original) {
+    const result = this.evaluatePronunciation(spoken, original);
+    const scoreColor = result.score >= 80 ? 'var(--success)' : result.score >= 60 ? 'var(--warning)' : 'var(--danger)';
+    const scoreText = result.score >= 90 ? '太棒了！发音很标准 🌟' :
+                      result.score >= 75 ? '不错哦，继续保持 💪' :
+                      result.score >= 60 ? '还行，多练几遍会更好的' :
+                      '别灰心，慢慢来，多读几遍就熟了';
+
+    let wordsHtml = '';
+    result.details.forEach(d => {
+      const color = d.matched ? 'var(--success)' : 'var(--danger)';
+      const deco = d.matched ? 'none' : 'line-through';
+      wordsHtml += `<span style="color:${color};text-decoration:${deco};margin:0 2px">${d.word}</span>`;
+    });
+
+    // 识别到的多余词
+    let extraHtml = '';
+    if (result.extra.length > 0) {
+      extraHtml = `<div class="text-sm" style="color:var(--warning);margin-top:6px">多读了的词: ${result.extra.map(w => `<span style="margin:0 2px">${w}</span>`).join('')}</div>`;
+    }
+
+    container.innerHTML = `
+      <div style="background:var(--primary-pale);border-radius:10px;padding:16px">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-bold">朗读评估</span>
+          <span class="font-bold" style="font-size:24px;color:${scoreColor}">${result.score}<span style="font-size:14px">分</span></span>
+        </div>
+        <div class="text-sm mb-2" style="color:${scoreColor}">${scoreText}</div>
+        <div style="font-size:15px;line-height:2;margin:8px 0">${wordsHtml}</div>
+        ${extraHtml}
+        <div class="text-sm text-muted" style="margin-top:8px">
+          📊 正确 ${result.matchedCount}/${result.totalWords} 词
+          ${result.missed.length > 0 ? `| 漏读: ${result.missed.join(', ')}` : ''}
+        </div>
+        <div class="text-sm text-hint" style="margin-top:6px">
+          💡 这只是基于语音识别的参考评分，想更精准的发音评估可以去橙啦练习哦
+        </div>
+      </div>
+    `;
+  },
+
+  /* ---- 发音评估核心逻辑 ---- */
+  evaluatePronunciation(spoken, original) {
+    // 标准化：转小写、去标点
+    const normalize = (text) => text.toLowerCase().replace(/[.,!?;:'"()]/g, '').replace(/\s+/g, ' ').trim();
+    const spokenWords = normalize(spoken).split(' ').filter(w => w);
+    const originalWords = normalize(original).split(' ').filter(w => w);
+
+    const spokenSet = [...spokenWords];
+    const originalSet = [...originalWords];
+    const details = [];
+    const missed = [];
+    let matchedCount = 0;
+
+    originalSet.forEach(word => {
+      const idx = spokenSet.indexOf(word);
+      if (idx > -1) {
+        details.push({ word, matched: true });
+        spokenSet.splice(idx, 1);
+        matchedCount++;
+      } else {
+        details.push({ word, matched: false });
+        missed.push(word);
+      }
+    });
+
+    const extra = spokenSet;
+    const totalWords = originalSet.length;
+    const score = Math.round((matchedCount / totalWords) * 100);
+
+    return { score, details, matchedCount, totalWords, missed, extra };
+  },
+
+  /* ---- 书法笔法讲解面板 ---- */
+  renderCalligraphyGuide(target) {
+    const today = StorageManager.todayStr();
+    const dayIdx = new Date(today).getDate() % CalligraphyTechniques.length;
+    let currentStart = dayIdx;
+
+    const render = () => {
+      // 每次展示4条
+      const items = [];
+      for (let i = 0; i < 4; i++) {
+        items.push(CalligraphyTechniques[(currentStart + i) % CalligraphyTechniques.length]);
+      }
+
+      let html = `
+        <div class="card" style="margin-bottom:16px">
+          <div class="flex justify-between items-center mb-2">
+            <span class="font-bold">今日推荐笔法</span>
+            <button class="btn btn-secondary btn-sm" id="refresh-technique">换一批 →</button>
+          </div>
+          <p class="text-sm text-muted mb-4">点击任意主题，自动跳转 B站 搜索相关讲解视频</p>
+
+          <div class="grid grid-2">
+      `;
+
+      items.forEach(t => {
+        const levelColor = t.level === '入门' ? 'tag-green' : t.level === '进阶' ? 'tag-blue' : t.level === '提升' ? 'tag-orange' : 'tag-purple';
+        html += `
+          <div class="card" style="cursor:pointer;border:1px solid var(--border-light)" data-keyword="${UI.escape(t.keyword)}">
+            <div class="flex justify-between items-start mb-1">
+              <span class="font-bold" style="font-size:14px">${t.name}</span>
+              <span class="tag ${levelColor}">${t.level}</span>
+            </div>
+            <div class="text-sm text-muted">${t.desc}</div>
+            <div class="text-sm text-hint" style="margin-top:6px">🔍 点击搜索讲解视频</div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-light)">
+            <div class="text-sm text-muted mb-2">🔎 自定义搜索笔法：</div>
+            <div class="flex gap-2">
+              <input type="text" class="input" id="custom-calligraphy" placeholder="比如：颜体 横画 起笔" style="flex:1">
+              <button class="btn btn-primary btn-sm" id="search-calligraphy-b">B站搜索</button>
+              <button class="btn btn-secondary btn-sm" id="search-calligraphy-y">YouTube</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      target.innerHTML = html;
+
+      // 点击推荐主题跳转B站
+      target.querySelectorAll('[data-keyword]').forEach(card => {
+        card.addEventListener('click', () => {
+          const kw = card.dataset.keyword;
+          const url = 'https://search.bilibili.com/all?keyword=' + encodeURIComponent(kw);
+          window.open(url, '_blank');
+          UI.toast(`正在B站搜索「${kw}」`);
+        });
+      });
+
+      // 刷新
+      target.querySelector('#refresh-technique').addEventListener('click', () => {
+        currentStart = (currentStart + 4) % CalligraphyTechniques.length;
+        render();
+      });
+
+      // 自定义搜索
+      const customInput = target.querySelector('#custom-calligraphy');
+      const doSearch = (platform) => {
+        const kw = customInput.value.trim();
+        if (!kw) { UI.toast('输入要搜索的笔法关键词'); return; }
+        const fullKw = '颜真卿 ' + kw;
+        const url = platform === 'bilibili'
+          ? 'https://search.bilibili.com/all?keyword=' + encodeURIComponent(fullKw)
+          : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(fullKw);
+        window.open(url, '_blank');
+        UI.toast(`正在搜索「${fullKw}」`);
+      };
+
+      target.querySelector('#search-calligraphy-b').addEventListener('click', () => doSearch('bilibili'));
+      target.querySelector('#search-calligraphy-y').addEventListener('click', () => doSearch('youtube'));
+      customInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') doSearch('bilibili');
+      });
+    };
+
+    render();
   },
 
   formatToday(dateStr) {

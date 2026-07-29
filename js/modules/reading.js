@@ -105,8 +105,8 @@ const ReadingModule = {
     // 搜索赏析
     target.querySelector('#poetry-search').addEventListener('click', () => {
       const kw = `${dailyPoem.title} ${dailyPoem.author} 赏析`;
-      window.open('https://search.bilibili.com/all?keyword=' + encodeURIComponent(kw), '_blank');
-      UI.toast(`正在搜索「${dailyPoem.title}」的赏析`);
+      window.open('https://www.douyin.com/search/' + encodeURIComponent(kw), '_blank');
+      UI.toast(`正在抖音搜索「${dailyPoem.title}」的赏析`);
     });
 
     // 复制全诗
@@ -139,8 +139,8 @@ const ReadingModule = {
     container.querySelectorAll('[data-poem]').forEach(card => {
       card.addEventListener('click', () => {
         const title = card.dataset.poem;
-        window.open('https://search.bilibili.com/all?keyword=' + encodeURIComponent(title + ' 赏析 朗诵'), '_blank');
-        UI.toast(`正在搜索「${title}」的朗诵和赏析`);
+        window.open('https://www.douyin.com/search/' + encodeURIComponent(title + ' 赏析 朗诵'), '_blank');
+        UI.toast(`正在抖音搜索「${title}」的朗诵和赏析`);
       });
     });
   },
@@ -173,8 +173,8 @@ const ReadingModule = {
     target.querySelectorAll('[data-book]').forEach(card => {
       card.addEventListener('click', () => {
         const title = card.dataset.book;
-        window.open('https://search.bilibili.com/all?keyword=' + encodeURIComponent(title + ' 书评 解读'), '_blank');
-        UI.toast(`正在搜索「${title}」的书评和解读`);
+        window.open('https://www.douyin.com/search/' + encodeURIComponent(title + ' 书评 解读'), '_blank');
+        UI.toast(`正在抖音搜索「${title}」的书评和解读`);
       });
     });
   },

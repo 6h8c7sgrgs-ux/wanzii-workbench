@@ -646,3 +646,272 @@ const MediaModule = {
     UI.toast(`为「${topic}」生成了${keywords.length}个关键词推荐`);
   }
 };
+
+/* ========== 抖音爆款推荐与拆解 ========== */
+const DouyinHotModule = {
+  init() {},
+
+  render(container) {
+    container.innerHTML = `
+      <div class="module-header">
+        <div class="module-title">🔥 抖音爆款推荐</div>
+        <div class="module-subtitle">拆解爆款逻辑，看懂流量密码</div>
+      </div>
+
+      <div class="subnav" style="margin:-8px 0 20px;padding:0;border:none;overflow:visible">
+        <div class="subnav-item active dh-tab" data-tab="cases" style="background:var(--primary);color:white">📋 爆款案例</div>
+        <div class="subnav-item dh-tab" data-tab="analysis" style="border:1px solid var(--border)">🔍 自助拆解</div>
+      </div>
+
+      <div id="dh-cases" class="tab-content active"></div>
+      <div id="dh-analysis" class="tab-content"></div>
+    `;
+
+    this.renderCases(container.querySelector('#dh-cases'));
+    this.renderAnalysis(container.querySelector('#dh-analysis'));
+
+    container.querySelectorAll('.dh-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        container.querySelectorAll('.dh-tab').forEach(t => {
+          t.classList.remove('active');
+          t.style.background = '';
+          t.style.color = '';
+          t.style.border = '1px solid var(--border)';
+        });
+        tab.classList.add('active');
+        tab.style.background = 'var(--primary)';
+        tab.style.color = 'white';
+        tab.style.border = 'none';
+        container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        container.querySelector(`#dh-${tab.dataset.tab}`).classList.add('active');
+      });
+    });
+  },
+
+  /* 爆款案例展示 */
+  renderCases(target) {
+    let html = `<div class="section-title">爆款案例库</div>`;
+    html += `<p class="text-sm text-muted mb-4">每个案例都附带详细拆解，点击「查看拆解」深入了解爆款逻辑</p>`;
+
+    // 分类筛选
+    const categories = [...new Set(DouyinHotCases.map(c => c.category))];
+    html += `<div class="flex gap-2 mb-4" style="flex-wrap:wrap">
+      <button class="btn btn-secondary btn-sm dh-cat" data-cat="all" style="background:var(--primary);color:white;border:none">全部</button>
+      ${categories.map(c => `<button class="btn btn-secondary btn-sm dh-cat" data-cat="${c}" style="border:1px solid var(--border)">${c}</button>`).join('')}
+    </div>`;
+
+    html += `<div id="dh-cases-list"></div>`;
+    target.innerHTML = html;
+
+    this.renderCaseList(target.querySelector('#dh-cases-list'), DouyinHotCases);
+
+    target.querySelectorAll('.dh-cat').forEach(btn => {
+      btn.addEventListener('click', () => {
+        target.querySelectorAll('.dh-cat').forEach(b => {
+          b.style.background = '';
+          b.style.color = '';
+          b.style.border = '1px solid var(--border)';
+        });
+        btn.style.background = 'var(--primary)';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+
+        const cat = btn.dataset.cat;
+        const filtered = cat === 'all' ? DouyinHotCases : DouyinHotCases.filter(c => c.category === cat);
+        this.renderCaseList(target.querySelector('#dh-cases-list'), filtered);
+      });
+    });
+  },
+
+  renderCaseList(container, cases) {
+    let html = `<div class="grid grid-2">`;
+    cases.forEach((c, i) => {
+      html += `
+        <div class="card" style="position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--primary-dark))"></div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="tag tag-red">🔥 ${c.category}</span>
+            <span class="text-sm text-hint">播放 ${c.data.plays}</span>
+          </div>
+          <h4 style="font-size:15px;color:var(--text-primary);margin-bottom:6px">${c.title}</h4>
+          <p class="text-sm text-muted mb-2">${c.desc}</p>
+          <div class="flex gap-2 mb-2" style="flex-wrap:wrap">
+            ${c.hooks.map(h => `<span class="tag tag-orange" style="font-size:10px">🪝 ${UI.escape(h)}</span>`).join('')}
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button class="btn btn-primary btn-sm" data-analyze="${i}">🔍 查看拆解</button>
+            <span class="text-sm text-hint" style="align-self:center">👍 ${c.data.likes} · 💬 ${c.data.comments}</span>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+
+    container.querySelectorAll('[data-analyze]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.analyze);
+        this.showAnalysis(cases[idx]);
+      });
+    });
+  },
+
+  showAnalysis(caseData) {
+    const items = caseData.拆解;
+    let content = `
+      <div style="margin-bottom:16px">
+        <div class="flex gap-2 mb-2" style="flex-wrap:wrap">
+          <span class="tag tag-red">🔥 ${caseData.category}</span>
+          <span class="tag tag-blue">播放 ${caseData.data.plays}</span>
+          <span class="tag tag-green">点赞 ${caseData.data.likes}</span>
+        </div>
+        <h4 style="font-size:16px;color:var(--primary-darker)">${caseData.title}</h4>
+        <p class="text-sm text-muted">${caseData.desc}</p>
+      </div>
+      <div style="border-top:1px solid var(--border-light);padding-top:12px">
+    `;
+
+    Object.entries(items).forEach(([key, val]) => {
+      const icon = { 选题:'🎯', 结构:'🏗️', 音乐:'🎵', 节奏:'⏱️', 互动:'💬' }[key] || '📌';
+      content += `
+        <div style="margin-bottom:12px">
+          <div class="font-bold text-sm" style="color:var(--primary-darker);margin-bottom:4px">${icon} ${key}</div>
+          <div class="text-sm" style="color:var(--text-secondary);line-height:1.7;padding-left:20px">${UI.escape(val)}</div>
+        </div>
+      `;
+    });
+
+    content += `
+      </div>
+      <div style="background:var(--primary-pale);border-radius:10px;padding:12px;margin-top:12px">
+        <div class="font-bold text-sm mb-1" style="color:var(--primary-darker)">♻️ 可复用启示</div>
+        <div class="text-sm" style="color:var(--text-secondary);line-height:1.7">${UI.escape(caseData.applicable)}</div>
+      </div>
+    `;
+
+    UI.modal({
+      title: `爆款拆解 · ${caseData.title}`,
+      content,
+      actions: [
+        { label: '收起来', style: 'primary' }
+      ]
+    });
+  },
+
+  /* 自助拆解工具 */
+  renderAnalysis(target) {
+    let html = `
+      <div class="section-title">自助拆解工具</div>
+      <p class="text-sm text-muted mb-4">看到一个爆款视频？按照下面的维度逐条拆解，你会发现爆款的秘密</p>
+
+      <div class="card mb-4">
+        <div class="form-group">
+          <label class="form-label">视频链接或描述（可选，帮你记住拆的是哪个）</label>
+          <input type="text" class="input" id="dh-video-ref" placeholder="比如：某博主的独居vlog">
+        </div>
+
+        <div id="dh-dimensions"></div>
+
+        <button class="btn btn-primary mt-4" id="dh-save-analysis">保存拆解</button>
+      </div>
+
+      <div id="dh-saved-list"></div>
+    `;
+
+    target.innerHTML = html;
+
+    // 渲染拆解维度
+    const dimsContainer = target.querySelector('#dh-dimensions');
+    let dimsHtml = '';
+    DouyinAnalysisTemplate.forEach((d, i) => {
+      dimsHtml += `
+        <div class="form-group">
+          <label class="form-label">${d.icon} ${d.dimension}</label>
+          <div class="text-sm text-hint" style="margin-bottom:4px">${d.desc}</div>
+          <textarea class="textarea" data-dim="${d.dimension}" placeholder写下你的分析..." style="min-height:60px"></textarea>
+        </div>
+      `;
+    });
+    dimsContainer.innerHTML = dimsHtml;
+
+    // 保存拆解
+    target.querySelector('#dh-save-analysis').addEventListener('click', () => {
+      const ref = target.querySelector('#dh-video-ref').value.trim();
+      const analyses = {};
+      let hasContent = false;
+      target.querySelectorAll('[data-dim]').forEach(t => {
+        const val = t.value.trim();
+        if (val) { analyses[t.dataset.dim] = val; hasContent = true; }
+      });
+
+      if (!hasContent) { UI.toast('至少写一个维度的分析再保存吧'); return; }
+
+      StorageManager.add('dh_analyses', {
+        ref: ref || '未标注',
+        analyses,
+        date: StorageManager.todayStr()
+      });
+      UI.toast('拆解已保存，继续保持拆解的习惯');
+
+      // 清空
+      target.querySelector('#dh-video-ref').value = '';
+      target.querySelectorAll('[data-dim]').forEach(t => t.value = '');
+      this.renderSavedList(target.querySelector('#dh-saved-list'));
+    });
+
+    this.renderSavedList(target.querySelector('#dh-saved-list'));
+  },
+
+  renderSavedList(container) {
+    const list = StorageManager.get('dh_analyses') || [];
+    if (list.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    let html = `<div class="section-title">我的拆解记录</div>`;
+    const sorted = list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    sorted.forEach(item => {
+      const dimCount = Object.keys(item.analyses).length;
+      html += `
+        <div class="list-item" style="cursor:pointer" data-view="${item.id}">
+          <span style="font-size:20px">🔍</span>
+          <div class="list-item-content">
+            <div class="list-item-title">${UI.escape(item.ref)}</div>
+            <div class="list-item-desc">${UI.formatDate(item.date)} · ${dimCount}个维度分析</div>
+          </div>
+          <button class="btn btn-danger btn-sm" data-del="${item.id}">删除</button>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('[data-view]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.dataset.del) return;
+        const data = list.find(x => x.id === item.dataset.view);
+        if (!data) return;
+        let content = `<p class="text-sm text-muted mb-2">${UI.formatDateFull(data.date)} · ${UI.escape(data.ref)}</p>`;
+        content += `<div style="border-top:1px solid var(--border-light);padding-top:10px">`;
+        Object.entries(data.analyses).forEach(([k, v]) => {
+          const icon = DouyinAnalysisTemplate.find(d => d.dimension === k)?.icon || '📌';
+          content += `<div style="margin-bottom:10px"><div class="font-bold text-sm" style="color:var(--primary-darker)">${icon} ${k}</div><div class="text-sm" style="color:var(--text-secondary);padding-left:18px;line-height:1.7;margin-top:2px">${UI.escape(v)}</div></div>`;
+        });
+        content += `</div>`;
+        UI.modal({ title: '拆解详情', content, actions: [{ label: '关闭', style: 'primary' }] });
+      });
+    });
+
+    container.querySelectorAll('[data-del]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        UI.confirm('删掉这条拆解记录吗？', () => {
+          StorageManager.remove('dh_analyses', btn.dataset.del);
+          UI.toast('已删除');
+          this.renderSavedList(container);
+        });
+      });
+    });
+  }
+};

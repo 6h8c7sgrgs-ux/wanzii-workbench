@@ -600,7 +600,7 @@ const CheckinModule = {
             <span class="font-bold">今日推荐笔法</span>
             <button class="btn btn-secondary btn-sm" id="refresh-technique">换一批 →</button>
           </div>
-          <p class="text-sm text-muted mb-4">点击任意主题，自动跳转 B站 搜索相关讲解视频</p>
+          <p class="text-sm text-muted mb-4">点击任意主题，自动跳转抖音搜索相关讲解视频</p>
 
           <div class="grid grid-2">
       `;
@@ -626,7 +626,7 @@ const CheckinModule = {
             <div class="text-sm text-muted mb-2">🔎 自定义搜索笔法：</div>
             <div class="flex gap-2">
               <input type="text" class="input" id="custom-calligraphy" placeholder="比如：颜体 横画 起笔" style="flex:1">
-              <button class="btn btn-primary btn-sm" id="search-calligraphy-b">B站搜索</button>
+              <button class="btn btn-primary btn-sm" id="search-calligraphy-b">🎵 抖音搜索</button>
               <button class="btn btn-secondary btn-sm" id="search-calligraphy-y">YouTube</button>
             </div>
           </div>
@@ -635,13 +635,13 @@ const CheckinModule = {
 
       target.innerHTML = html;
 
-      // 点击推荐主题跳转B站
+      // 点击推荐主题跳转抖音
       target.querySelectorAll('[data-keyword]').forEach(card => {
         card.addEventListener('click', () => {
           const kw = card.dataset.keyword;
-          const url = 'https://search.bilibili.com/all?keyword=' + encodeURIComponent(kw);
+          const url = 'https://www.douyin.com/search/' + encodeURIComponent(kw);
           window.open(url, '_blank');
-          UI.toast(`正在B站搜索「${kw}」`);
+          UI.toast(`正在抖音搜索「${kw}」`);
         });
       });
 
@@ -657,17 +657,17 @@ const CheckinModule = {
         const kw = customInput.value.trim();
         if (!kw) { UI.toast('输入要搜索的笔法关键词'); return; }
         const fullKw = '颜真卿 ' + kw;
-        const url = platform === 'bilibili'
-          ? 'https://search.bilibili.com/all?keyword=' + encodeURIComponent(fullKw)
+        const url = platform === 'douyin'
+          ? 'https://www.douyin.com/search/' + encodeURIComponent(fullKw)
           : 'https://www.youtube.com/results?search_query=' + encodeURIComponent(fullKw);
         window.open(url, '_blank');
         UI.toast(`正在搜索「${fullKw}」`);
       };
 
-      target.querySelector('#search-calligraphy-b').addEventListener('click', () => doSearch('bilibili'));
+      target.querySelector('#search-calligraphy-b').addEventListener('click', () => doSearch('douyin'));
       target.querySelector('#search-calligraphy-y').addEventListener('click', () => doSearch('youtube'));
       customInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') doSearch('bilibili');
+        if (e.key === 'Enter') doSearch('douyin');
       });
     };
 

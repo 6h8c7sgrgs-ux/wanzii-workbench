@@ -51,6 +51,15 @@ const ModuleRegistry = {
       render: (c) => DouyinHotModule.render(c),
       init: () => DouyinHotModule.init()
     },
+    {
+      id: 'sales',
+      name: '销售记录',
+      navId: 'work',
+      icon: '💰',
+      keywords: ['销售', '卖出', '订单', '收入', '客户', '茶叶销售', '寿山石销售'],
+      render: (c) => SalesModule.render(c),
+      init: () => SalesModule.init()
+    },
 
     // ---------- 读书 ----------
     {
